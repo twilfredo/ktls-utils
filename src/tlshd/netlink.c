@@ -472,6 +472,12 @@ void tlshd_genl_done(struct tlshd_handshake_parms *parms)
 	if (err < 0)
 		goto out_free;
 
+	err = nla_put_u32(msg, HANDSHAKE_A_DONE_RECORD_SIZE_LIMIT, parms->record_size_limit);
+	if (err < 0) {
+		tlshd_log_nl_error("nla_put record_size_limit", err);
+		goto out_free;
+	}
+
 sendit:
 	if (tlshd_delay_done) {
 		/* Undocumented tlshd.conf parameter:
