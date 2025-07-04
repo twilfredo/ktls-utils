@@ -80,6 +80,7 @@ static void tlshd_save_nagle(gnutls_session_t session, int *saved)
 void tlshd_start_tls_handshake(gnutls_session_t session,
 			       struct tlshd_handshake_parms *parms)
 {
+	size_t record_size_limit;
 	int saved, ret;
 	char *desc;
 
@@ -111,6 +112,11 @@ void tlshd_start_tls_handshake(gnutls_session_t session,
 	gnutls_free(desc);
 
 	parms->session_status = tlshd_initialize_ktls(session);
+	ret = gnutls_record_get_record_size_limit(session, &record_size_limit);
+	if (ret)
+		tlshd_log_notice("Record size limit is unspecified\n", ret);
+	else
+		parms->record_size_limit = (uint32_t)record_size_limit;
 }
 
 /**
