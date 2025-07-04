@@ -112,6 +112,7 @@ void tlshd_start_tls_handshake(gnutls_session_t session,
 	gnutls_free(desc);
 
 	parms->session_status = tlshd_initialize_ktls(session);
+	parms->record_size_limit = (uint32_t)gnutls_record_get_max_send_size(session);
 }
 
 /**
