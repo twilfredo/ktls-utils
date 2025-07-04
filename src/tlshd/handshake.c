@@ -80,6 +80,7 @@ static void tlshd_save_nagle(gnutls_session_t session, int *saved)
 void tlshd_start_tls_handshake(gnutls_session_t session,
 			       struct tlshd_handshake_parms *parms)
 {
+	size_t max_record_send_size;
 	int saved, ret;
 	char *desc;
 
@@ -111,6 +112,11 @@ void tlshd_start_tls_handshake(gnutls_session_t session,
 	gnutls_free(desc);
 
 	parms->session_status = tlshd_initialize_ktls(session);
+	ret = gnutls_record_get_max_send_size(session, &max_record_send_size);
+	if (ret)
+		tlshd_log_notice("Maximum record send size unspecified\n", ret);
+	else
+		parms->record_size = max_record_send_size;
 }
 
 /**
