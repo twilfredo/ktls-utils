@@ -44,7 +44,7 @@ struct tlshd_handshake_parms {
 	int		msg_status;
 
 	unsigned int	session_status;
-	size_t          record_size;
+	uint32_t        record_size;
 
 	unsigned int	num_remote_peerids;
 	key_serial_t	remote_peerid[10];

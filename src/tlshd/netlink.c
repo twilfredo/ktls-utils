@@ -472,7 +472,7 @@ void tlshd_genl_done(struct tlshd_handshake_parms *parms)
 	if (err < 0)
 		goto out_free;
 
-	err = nla_put_s32(msg, HANDSHAKE_A_DONE_RECORD_SIZE, parms->record_size);
+	err = nla_put_u32(msg, HANDSHAKE_A_DONE_RECORD_SIZE, parms->record_size);
 	if (err < 0) {
 		tlshd_log_nl_error("nla_put record size", err);
 		goto out_free;

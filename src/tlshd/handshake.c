@@ -116,7 +116,7 @@ void tlshd_start_tls_handshake(gnutls_session_t session,
 	if (ret)
 		tlshd_log_notice("Maximum record send size unspecified\n", ret);
 	else
-		parms->record_size = max_record_send_size;
+		parms->record_size = (uint32_t)max_record_send_size;
 }
 
 /**
