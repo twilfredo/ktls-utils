@@ -269,6 +269,15 @@ void tlshd_service_socket(void)
 			// We don't expect a KeyUpdate response
 			ret = gnutls_session_key_update(session, 0);
 			break;
+		case HANDSHAKE_KEY_UPDATE_TYPE_SEND_REQUEST_UPDATE:
+			// Client keyupdate and request server key update
+			tlshd_log_debug("updating client's key and asking server...\n");
+			ret = gnutls_session_key_update(session, GNUTLS_KU_PEER);
+			if (ret < 0)
+				tlshd_log_error("error in key update: %s\n", gnutls_strerror(ret));
+
+			tlshd_log_debug("updating client's key and asking server: [OK]\n");
+			break;
 		case HANDSHAKE_KEY_UPDATE_TYPE_RECEIVED:
 			// We received a KeyUpdate and the peer doesn't
 			// expect a response
