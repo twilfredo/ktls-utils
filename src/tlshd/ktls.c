@@ -363,6 +363,9 @@ unsigned int tlshd_initialize_ktls(gnutls_session_t session)
 		return EIO;
 	}
 
+	if (tlshd_set_record_size(session) < 0)
+		return EIO;
+
 	gnutls_transport_get_int2(session, &sockin, &sockout);
 
 	switch (gnutls_cipher_get(session)) {

@@ -83,6 +83,11 @@ extern void tlshd_start_tls_handshake(gnutls_session_t session,
 				      struct tlshd_handshake_parms *parms);
 extern void tlshd_service_socket(void);
 
+#if defined(HAVE_GNUTLS_RECORD_GET_MAX_SEND_SIZE) && defined(HAVE_TLS_TX_MAX_PAYLOAD_LEN)
+extern int tlshd_set_record_size(gnutls_session_t session);
+#else
+static inline int tlshd_set_record_size(gnutls_session_t session __attribute__((unused))) { return 0; }
+#endif
 /* keyring.c */
 extern bool tlshd_keyring_get_psk_username(key_serial_t serial,
 					   char **username);
