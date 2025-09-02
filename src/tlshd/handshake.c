@@ -43,6 +43,18 @@
 #include "tlshd.h"
 #include "netlink.h"
 
+static void tlshd_set_record_size(gnutls_session_t session, uint16_t val)
+{
+	int ret;
+
+/* TODO: this needs to be installed into sys libs */
+#define TLS_TX_RECORD_SIZE_LIM 5
+    ret = setsockopt(gnutls_transport_get_int(session), SOL_TLS,
+			 TLS_TX_RECORD_SIZE_LIM, &val, sizeof(val));
+	if (ret < 0)
+		tlshd_log_perror("setsockopt (TLS_RX_RECORD_SIZE_LIM)");
+}
+
 static void tlshd_set_nagle(gnutls_session_t session, int val)
 {
 	int ret;
@@ -80,6 +92,7 @@ static void tlshd_save_nagle(gnutls_session_t session, int *saved)
 void tlshd_start_tls_handshake(gnutls_session_t session,
 			       struct tlshd_handshake_parms *parms)
 {
+	uint16_t max_send_size;
 	int saved, ret;
 	char *desc;
 
@@ -112,6 +125,9 @@ void tlshd_start_tls_handshake(gnutls_session_t session,
 	gnutls_free(desc);
 
 	parms->session_status = tlshd_initialize_ktls(session);
+
+	max_send_size = gnutls_record_get_max_send_size(session);
+	tlshd_set_record_size(session, max_send_size);
 }
 
 /**
