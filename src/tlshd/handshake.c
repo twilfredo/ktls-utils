@@ -43,9 +43,30 @@
 #include <gnutls/abstract.h>
 
 #include <glib.h>
+#include <linux/tls.h>
 
 #include "tlshd.h"
 #include "netlink.h"
+
+#ifdef HAVE_GNUTLS_RECORD_GET_MAX_SEND_SIZE
+int tlshd_set_record_size(gnutls_session_t session)
+{
+	uint16_t max_send_size;
+	int ret;
+
+	max_send_size = gnutls_record_get_max_send_size(session);
+	/* For TLS 1.3 kernel expects us to account for the ContentType */
+	if (gnutls_protocol_get_version(session) == GNUTLS_TLS1_3)
+		max_send_size -= 1;
+
+	ret = setsockopt(gnutls_transport_get_int(session), SOL_TLS,
+			 TLS_TX_MAX_PAYLOAD_LEN, &max_send_size, sizeof(max_send_size));
+	if (ret < 0)
+		tlshd_log_perror("setsockopt (TLS_TX_MAX_PAYLOAD_LEN)");
+
+	return ret;
+}
+#endif
 
 /**
  * @brief Toggle the use of the Nagle algorithm
@@ -125,6 +146,7 @@ void tlshd_start_tls_handshake(gnutls_session_t session,
 	gnutls_free(desc);
 
 	parms->session_status = tlshd_initialize_ktls(session);
+	tlshd_set_record_size(session);
 }
 
 /**

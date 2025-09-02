@@ -85,6 +85,9 @@ AC_CHECK_LIB([gnutls], [gnutls_get_system_config_file],
 AC_CHECK_LIB([gnutls], [gnutls_psk_allocate_client_credentials2],
              [AC_DEFINE([HAVE_GNUTLS_PSK_ALLOCATE_CREDENTIALS2], [1],
                         [Define to 1 if you have the gnutls_psk_allocate_client_credentials2 function.])])
+AC_CHECK_LIB([gnutls], [gnutls_record_get_max_send_size],
+             [AC_DEFINE([HAVE_GNUTLS_RECORD_GET_MAX_SEND_SIZE], [1],
+			[Define to 1 if you have the gnutls_record_get_max_send_size function.])])
 
 AC_MSG_CHECKING(for ML-DSA support in gnutls)
 AC_COMPILE_IFELSE(
