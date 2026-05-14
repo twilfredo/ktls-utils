@@ -180,6 +180,7 @@ static int tlshd_set_record_size(gnutls_session_t session)
 {
 	uint16_t max_send_size;
 	int ret;
+	tlshd_log_debug("wmk: tlshd_set_record_size()");
 
 	max_send_size = gnutls_record_get_max_send_size(session);
 	/* For TLS 1.3 kernel expects us to account for the ContentType */
@@ -189,7 +190,11 @@ static int tlshd_set_record_size(gnutls_session_t session)
 	ret = setsockopt(gnutls_transport_get_int(session), SOL_TLS,
 			 TLS_TX_MAX_PAYLOAD_LEN, &max_send_size, sizeof(max_send_size));
 	if (ret < 0)
-		tlshd_log_perror("setsockopt (TLS_TX_MAX_PAYLOAD_LEN)");
+		tlshd_log_debug("wmk: setsockopt (TLS_TX_MAX_PAYLOAD_LEN) error: %d",
+				 max_send_size);
+	else
+		tlshd_log_debug("wmk: tlshd_set_record_size success: %d",
+				 max_send_size);
 
 	return ret;
 }
@@ -245,6 +250,7 @@ void tlshd_start_tls_handshake(gnutls_session_t session,
 	parms->session_status = tlshd_initialize_ktls(session, READ_WRITE);
 
 #if defined(HAVE_GNUTLS_RECORD_GET_MAX_SEND_SIZE) && defined(HAVE_TLS_TX_MAX_PAYLOAD_LEN)
+	tlshd_log_error("wmk: calling_set_record_size");
 	if (tlshd_set_record_size(session) < 0)
 		parms->session_status = EIO;
 #endif
